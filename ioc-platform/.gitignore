@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+/dist/
+build/
+.eggs/
+.pytest_cache/
+
+# Environment
+.env
+
+# Node
+node_modules/
+ui/node_modules/
+# Build output. The root-anchored /dist/ rule above does not match this path,
+# which is why the bundle was being committed. Build with `npm run build`.
+ui/dist/
+
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/ioc_platform.db
+data/*.db-wal
+data/*.db-shm
+data/*.db-journal
+.cache/
+.coverage
+data-test
+.mimocode/
+ui/tsconfig.tsbuildinfo
+.playwright-mcp/
+
+# OpenCode config
+.opencode/
+
+# Kilo agent worktrees and session state
+.kilo/
+
+
+# Planning / working dirs
+.planning/
+undefined/
+
+# Logs & scratch
+*.log
+backend.log
+backend.err.log
+ui/*.log
+temp/
+live_probe_output.json
+
+# Test Artifacts & Screenshots
+ui/e2e-proof/
+ui/qa-shots/

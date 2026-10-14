@@ -1,0 +1,520 @@
+@import "tailwindcss";
+
+/* =============================================================
+   SecConflux design tokens.
+
+   ONE SOURCE OF TRUTH. Every tool reads from this file. The five
+   tools each carry their own accent hue so they stay visually
+   distinct, but they share the neutral ramp, the type scale, the
+   spacing rhythm, the radius set and the motion curves. That shared
+   skeleton is what makes five tools read as one product.
+
+   Accent is a RUNTIME VARIABLE, not a build-time one. `<html data-tool="ioc">`
+   sets `--accent` and the entire product re-tints. No per-tool CSS exists.
+   ============================================================= */
+
+@theme {
+  /* Neutral ramp. Slightly blue-shifted so the accent never looks
+     like it is fighting the greys. */
+  --color-canvas: #06070d;
+  --color-canvas-2: #080a12;
+  --color-surface: #0c0e1a;
+  --color-surface-2: #111427;
+  --color-surface-3: #161937;
+  --color-surface-4: #1d2142;
+  --color-line: #1e2340;
+  --color-line-2: #2b3157;
+  --color-line-3: #3a4172;
+
+  --color-ink: #e8ebf5;
+  --color-ink-2: #c3cbe4;
+  --color-ink-3: #8b95b8;
+  --color-ink-4: #626c8f;
+
+  /* Semantic. These are verdict colours, so they are deliberately
+     fixed across every tool: green means clean everywhere, amber
+     means investigate, red means act. A user who learns one tool's
+     colour language has learned the whole product. */
+  --color-ok: #34d399;
+  --color-ok-2: #10b981;
+  --color-warn: #fbbf24;
+  --color-warn-2: #f59e0b;
+  --color-bad: #f87171;
+  --color-bad-2: #ef4444;
+  --color-info: #38bdf8;
+  --color-info-2: #0ea5e9;
+  --color-magic: #a855f7;
+  --color-magic-2: #ec4899;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Fira Code", "Cascadia Code", monospace;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 13px;
+  --radius-xl: 18px;
+  --radius-2xl: 26px;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px -6px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 20px 48px -12px rgb(0 0 0 / 0.6);
+  --shadow-glow: 0 0 0 1px rgb(129 140 248 / 0.16), 0 16px 40px -12px rgb(129 140 248 / 0.24);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Set by the shell. The header is one row on the landing page and two rows
+   when a tool has sub-sections, so anything sticky below it reads this
+   instead of hard-coding a pixel value that is wrong half the time. */
+:root {
+  --shell-header-h: 56px;
+}
+
+/* Accent indirection. --tool-accent is set per tool by the shell. */
+:root {
+  --tool-accent: #818cf8;
+  --tool-accent-2: #a855f7;
+  --tool-tint: rgb(129 140 248 / 0.12);
+  --tool-tint-2: rgb(129 140 248 / 0.24);
+  --tool-glow: rgb(129 140 248 / 0.4);
+  --tool-tint-soft: rgb(129 140 248 / 0.06);
+}
+
+html[data-tool="home"] {
+  --tool-accent: #a78bfa;
+  --tool-accent-2: #22d3ee;
+  --tool-tint: rgb(167 139 250 / 0.13);
+  --tool-tint-2: rgb(167 139 250 / 0.26);
+  --tool-glow: rgb(167 139 250 / 0.42);
+  --tool-tint-soft: rgb(167 139 250 / 0.06);
+}
+html[data-tool="malware"] {
+  --tool-accent: #818cf8;
+  --tool-accent-2: #c084fc;
+  --tool-tint: rgb(129 140 248 / 0.12);
+  --tool-tint-2: rgb(129 140 248 / 0.24);
+  --tool-glow: rgb(129 140 248 / 0.4);
+  --tool-tint-soft: rgb(129 140 248 / 0.06);
+}
+html[data-tool="ioc"] {
+  --tool-accent: #facc15;
+  --tool-accent-2: #fb923c;
+  --tool-tint: rgb(250 204 21 / 0.12);
+  --tool-tint-2: rgb(250 204 21 / 0.24);
+  --tool-glow: rgb(250 204 21 / 0.35);
+  --tool-tint-soft: rgb(250 204 21 / 0.06);
+}
+html[data-tool="events"] {
+  --tool-accent: #38bdf8;
+  --tool-accent-2: #22d3ee;
+  --tool-tint: rgb(56 189 248 / 0.12);
+  --tool-tint-2: rgb(56 189 248 / 0.24);
+  --tool-glow: rgb(56 189 248 / 0.4);
+  --tool-tint-soft: rgb(56 189 248 / 0.06);
+}
+html[data-tool="phishing"] {
+  --tool-accent: #fb7185;
+  --tool-accent-2: #f472b6;
+  --tool-tint: rgb(251 113 133 / 0.12);
+  --tool-tint-2: rgb(251 113 133 / 0.24);
+  --tool-glow: rgb(251 113 133 / 0.38);
+  --tool-tint-soft: rgb(251 113 133 / 0.06);
+}
+html[data-tool="ruleforge"] {
+  --tool-accent: #2dd4bf;
+  --tool-accent-2: #34d399;
+  --tool-tint: rgb(45 212 191 / 0.12);
+  --tool-tint-2: rgb(45 212 191 / 0.24);
+  --tool-glow: rgb(45 212 191 / 0.35);
+  --tool-tint-soft: rgb(45 212 191 / 0.06);
+}
+
+/* =============================================================
+   BRAND COLOUR — ACHROMATIC, ON PURPOSE
+
+   The mark used `--tool-accent`, so on Malware Analyzer's pages the
+   SecConflux logo was indigo while the tool was indigo, and the platform
+   could not be told from the thing it was hosting. Moving the brand to its
+   own indigo-cyan barely helped: the tools already occupy the whole hue wheel
+   between them.
+
+     malware   indigo -> purple
+     ioc       amber  -> orange
+     events    sky    -> cyan
+     phishing  rose   -> pink
+     ruleforge teal   -> emerald
+
+   There is no hue left to pick that cannot eventually collide with a tool.
+   So the brand takes no hue at all. It is white-to-silver, always, on every
+   tool, in both themes. A coloured surface can never be mistaken for it,
+   because it is the only thing in the header that is not coloured.
+
+   These tokens live outside the per-tool cascade deliberately: no
+   `data-tool` value can reach them.
+   ============================================================= */
+:root {
+  --brand: #f8fafc;
+  --brand-2: #94a3b8;
+  --brand-tint: rgb(248 250 252 / 0.1);
+  --brand-tint-2: rgb(248 250 252 / 0.22);
+}
+
+/* =============================================================
+   LIGHT MODE
+
+   RuleForge shipped light-on-dark-grey, and users of a report-heavy
+   tool read for a long time. Light is not an afterthought here: it
+   is the same token names with different values, so every component
+   works in both without a single conditional.
+   ============================================================= */
+html.light {
+  --color-canvas: #f6f7fb;
+  /* In light mode a white brand disappears into a white page, so the mark
+     inverts: near-black to slate. Still achromatic, still unmistakable,
+     still nothing like a tool hue. */
+  --brand: #0f172a;
+  --brand-2: #475569;
+  --brand-tint: rgb(15 23 42 / 0.06);
+  --brand-tint-2: rgb(15 23 42 / 0.16);
+  --color-canvas-2: #eef0f7;
+  --color-surface: #ffffff;
+  --color-surface-2: #f7f8fc;
+  --color-surface-3: #eef1f8;
+  --color-surface-4: #e4e8f2;
+  --color-line: #e0e4ef;
+  --color-line-2: #cfd5e4;
+  --color-line-3: #b3bcd0;
+
+  --color-ink: #0f1320;
+  --color-ink-2: #333a4d;
+  --color-ink-3: #5d6579;
+  --color-ink-4: #858da3;
+
+  --color-ok: #059669;
+  --color-ok-2: #047857;
+  --color-warn: #b45309;
+  --color-warn-2: #92400e;
+  --color-bad: #dc2626;
+  --color-bad-2: #b91c1c;
+  --color-info: #0284c7;
+  --color-info-2: #0369a1;
+  --color-magic: #9333ea;
+  --color-magic-2: #db2777;
+
+  --shadow-sm: 0 1px 2px rgb(15 19 32 / 0.06);
+  --shadow-md: 0 8px 24px -8px rgb(15 19 32 / 0.12);
+  --shadow-lg: 0 20px 48px -12px rgb(15 19 32 / 0.16);
+
+  --tool-tint-soft: rgb(129 140 248 / 0.05);
+}
+
+/* ============================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+/* =============================================================
+   BASE LAYER
+
+   Every element reset lives in `@layer base`, and that is not tidiness.
+
+   `@import "tailwindcss"` opens `@layer theme, base, components, utilities`.
+   Unlayered CSS outranks ALL of those layers, so an unlayered
+   `button { background: none; border: none; padding: 0 }` silently defeats
+   `bg-*`, `border` and `px-*` on every button in the product. It produced
+   buttons with no fill, no border and no horizontal padding, which read as
+   "misaligned" rather than as a cascade bug — the height was still coming
+   from `h-8`, so the box looked right while its contents did not.
+
+   Anything that resets an element belongs in base. Anything that styles one
+   belongs in a component, and a utility always wins over both.
+   ============================================================= */
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+  }
+
+  ::selection {
+    background: var(--tool-tint-2);
+    color: var(--color-ink);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  a {
+    color: var(--tool-accent);
+    text-decoration: none;
+  }
+
+  code,
+  pre,
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--tool-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Scrollbars, dark and light alike. Also base: a `*` reset is exactly the
+     kind of rule that must never outrank a utility. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-2) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-2);
+    border-radius: 99px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-line-3);
+    background-clip: padding-box;
+  }
+}
+
+@layer components {
+  /* The one place a surface is defined. Everything else composes. */
+  .sc-surface {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+  }
+
+  .sc-elevated {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+  }
+
+  /* Hairline gradient edge, used on hero surfaces and the header. */
+  .sc-accent-edge {
+    position: relative;
+  }
+  .sc-accent-edge::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--tool-tint-2),
+      var(--tool-tint-2),
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .sc-grid-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(var(--color-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.5;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 78%);
+  }
+
+  .sc-glass {
+    background: color-mix(in srgb, var(--color-canvas) 82%, transparent);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  }
+
+  /* Centred strips in the header can outgrow the viewport on a narrow
+     window. They scroll, but they must not show a scrollbar sitting in the
+     middle of a navigation bar. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* SCROLL CHAINING.
+
+     A scrollable child that has reached its end passes the remaining scroll
+     to its nearest scrollable ancestor. With a dropdown parked over the page,
+     that means hovering the dropdown and scrolling moves the PAGE behind it
+     while the dropdown stays put — the page slides out from under the menu
+     and the menu appears to be floating over unrelated content.
+
+     `overscroll-behavior: contain` stops the transfer. The dropdown now
+     consumes the whole gesture and the page underneath stays exactly where
+     it was. `contain` rather than `none` because `none` would also disable
+     pull-to-refresh chaining, which is not the behaviour being fixed. */
+  .sc-overscroll {
+    overscroll-behavior: contain;
+  }
+
+  /* Applied to the overlay behind a modal and a palette, which covers the
+     whole viewport: this is where a wheel gesture that misses a list should
+     go. */
+  .sc-overscroll-page {
+    overscroll-behavior: contain;
+  }
+
+  /* A chip row that clips a label mid-word looks like a collision rather than
+     like something scrollable. Fading the trailing edge says "there is more
+     this way" without adding a control to a bar that has no room for one. */
+  .sc-fade-right {
+    mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent 100%);
+  }
+  .sc-fade-left {
+    mask-image: linear-gradient(90deg, transparent 0, #000 28px);
+  }
+  .sc-fade-both {
+    mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+  }
+}
+
+@keyframes sc-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sc-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sc-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The stripe overlay is a full-bleed element inside a bar that may be six
+   pixels tall. Animating `transform` on it slid a solid block across the bar
+   instead of moving the stripes, so the animation has to run on
+   `background-position`. */
+@keyframes sc-stripes {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+@keyframes sc-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--tool-tint-2);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes sc-cursor {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes sc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sc-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.sc-anim-up {
+  animation: sc-fade-up 0.4s var(--ease-out) both;
+}
+.sc-anim-in {
+  animation: sc-fade 0.25s var(--ease-in-out) both;
+}
+.sc-anim-pop {
+  animation: sc-scale-in 0.18s var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

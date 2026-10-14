@@ -1,0 +1,104 @@
+# ====================================================================
+# Git Ignore Configuration for Combined Project (SecConflux Suite)
+# ====================================================================
+
+# Environment & Secrets (NEVER upload credentials or API keys)
+.env
+.env.*
+!.env.example
+*.env
+*.pem
+*.key
+*.cert
+*.pfx
+secrets/
+credentials.json
+
+# Cache directories & runtime temp
+.cache/
+*/.cache/
+*/*/.cache/
+.pytest_cache/
+*/.pytest_cache/
+.coverage
+htmlcov/
+*.py[cod]
+*$py.class
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+
+# Dependencies
+node_modules/
+*/node_modules/
+*/*/node_modules/
+.npm/
+
+# Build artifacts & distribution
+dist/
+*/dist/
+*/*/dist/
+build/
+out/
+.vite/
+.vite-temp/
+*/.vite-temp/
+
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+
+# Compressed Archives & Backups (as requested)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.bak
+*.backup
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Databases & Runtime storage (local logs, caches, scan DBs)
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite3-journal
+*.db-wal
+*.db-shm
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+*/data/*.db
+*/data/*.sqlite
+*/data/*.sqlite3
+
+# OS & Editor generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+.kilo/
+*/.kilo/
+*/*/.kilo/
+
+# AI chat transcripts / session dumps
+session-*.md
+*/session-*.md
+
+# Log files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

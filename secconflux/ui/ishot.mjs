@@ -1,0 +1,15 @@
+﻿import puppeteer from "puppeteer-core";
+const browser = await puppeteer.launch({ executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", headless: "new", args: ["--no-sandbox"] });
+const page = await browser.newPage();
+await page.setViewport({ width: 1600, height: 1100 });
+await page.evaluateOnNewDocument(() => localStorage.setItem("secconflux.visits", JSON.stringify({home:9,malware:9,ioc:9,events:9,phishing:9,ruleforge:9})));
+await page.goto("http://127.0.0.1:7000/#/t/ioc", { waitUntil: "domcontentloaded" });
+await new Promise(r => setTimeout(r, 700));
+await page.evaluate(() => [...document.querySelectorAll('header [role=tab]:not([data-chip])')].find(t => t.textContent.trim() === "Lookup")?.click());
+await new Promise(r => setTimeout(r, 600));
+await page.screenshot({ path: "shots/ioc-lookup.png" });
+await page.evaluate(() => [...document.querySelectorAll("button")].find(b => b.textContent.includes("Analyze Indicator"))?.click());
+await new Promise(r => setTimeout(r, 2800));
+await page.screenshot({ path: "shots/ioc-result.png", fullPage: true });
+console.log("ok");
+await browser.close();

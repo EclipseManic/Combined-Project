@@ -1,0 +1,40 @@
+# Packaging metadata for RuleForge.
+#
+# TESTS ARE NOT RUN THROUGH THIS FILE. From the repository root:
+#
+#     python -m unittest discover -s tests -t .
+#
+# `-s tests` is where the tests live; `-t .` keeps the repository root as the
+# top-level import directory, so `import ruleforge` resolves against the source
+# tree with no install step and no PYTHONPATH fiddling. Individual modules run
+# the same way, e.g. `python -m unittest tests.test_dialects -v`.
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ruleforge"
+# Must stay in step with `__version__` in ruleforge/__init__.py.
+version = "0.1.0"
+description = "A detection rule workbench for enterprise SIEM detection rules."
+requires-python = ">=3.10"
+
+# Deliberately empty, and not an oversight to be filled in later. RuleForge is
+# stdlib-only: the engine, every dialect and the whole test suite import nothing
+# outside the standard library, which is what lets it run unmodified inside a
+# locked-down SOC where `pip install` is not available. Adding an entry here is
+# an architectural decision, not a convenience.
+dependencies = []
+
+# 3.10 is the floor because the dataclasses carry `slots=True`, which 3.9 does
+# not accept. Nothing in the package uses a 3.11+ feature, so the floor is the
+# real one rather than a guess.
+
+[tool.setuptools]
+# Listed explicitly rather than auto-discovered. The repository is a flat layout
+# with `ruleforge/`, `tests/` and `data/` side by side at the root, and
+# setuptools' auto-discovery refuses to choose between multiple top-level
+# directories -- so naming the two real packages is what makes the build
+# deterministic, and it also keeps `tests` and `data` out of the wheel.
+packages = ["ruleforge", "ruleforge.dialects"]

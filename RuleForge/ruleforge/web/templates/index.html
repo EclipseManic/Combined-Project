@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<!--
+  RuleForge: a local detection-rule workbench.
+
+  One page, four panes, no build step. The GUI is served straight off disk by
+  the stdlib HTTP server because the whole package has zero dependencies, and
+  that is what lets it run inside a locked-down SOC where npm and pip are not
+  available.
+
+  The builder edits the IR directly -- the same tagged JSON the codec reads and
+  writes. There is deliberately no second, simplified rule model in the
+  browser: a parallel representation is where "the GUI showed one thing and the
+  rendered rule said another" comes from.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RuleForge</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Rule<span>Forge</span></div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-pane="build">Build</button>
+    <button class="tab" data-pane="import">Import &amp; Tune</button>
+    <button class="tab" data-pane="fromlog">From Log</button>
+    <button class="tab" data-pane="history">History</button>
+  </nav>
+  <div class="topright">
+    <label class="inline">Dialect
+      <select id="dialect"></select>
+    </label>
+    <button id="save" class="primary">Save version</button>
+  </div>
+</header>
+
+<div id="toast" class="toast" hidden></div>
+
+<!-- ================================================================== -->
+<section class="pane active" id="pane-build">
+  <div class="three-col">
+
+    <!-- metadata ------------------------------------------------------- -->
+    <div class="col scroll">
+      <h2>Rule</h2>
+      <label class="field">Rule id<input id="rule-id" type="text" placeholder="lsass-ntlm-001"></label>
+      <label class="field">Title<input id="an-title" type="text" placeholder="Credential access then NTLM lateral movement"></label>
+      <label class="field">Description<textarea id="an-description" rows="3"></textarea></label>
+      <div class="row2">
+        <label class="field">Severity
+          <select id="an-severity">
+            <option value="">—</option>
+            <option>informational</option><option>low</option>
+            <option>medium</option><option>high</option><option>critical</option>
+          </select>
+        </label>
+        <label class="field">Author<input id="an-author" type="text"></label>
+      </div>
+      <label class="field">MITRE ATT&amp;CK
+        <input id="an-mitre" type="text" placeholder="credential-access: T1003, T1003.001">
+      </label>
+      <p class="hint">One tactic per line, techniques comma-separated after a colon.</p>
+      <label class="field">References<textarea id="an-references" rows="2" placeholder="one URL per line"></textarea></label>
+      <label class="field">Known false positives<textarea id="an-fps" rows="2" placeholder="one per line"></textarea></label>
+
+      <h2>Source table</h2>
+      <label class="field">Table<input id="read-table" type="text" placeholder="SecurityEvent"></label>
+      <label class="field">Index-time selector<input id="read-selector" type="text" placeholder="index=main sourcetype=..."></label>
+      <p class="hint">Kept verbatim and never evaluated locally: an index-time
+        filter runs in the store before any row exists.</p>
+      <label class="field">Time field<input id="read-timefield" type="text" placeholder="TimeGenerated"></label>
+    </div>
+
+    <!-- pipeline ------------------------------------------------------- -->
+    <div class="col scroll">
+      <h2>Pipeline
+        <span class="spacer"></span>
+        <select id="add-stage-kind" class="mini">
+          <option value="Filter">Filter</option>
+          <option value="Aggregate">Aggregate</option>
+          <option value="Derive">Derive</option>
+          <option value="Project">Project</option>
+          <option value="Sort">Sort</option>
+          <option value="Limit">Limit</option>
+          <option value="Distinct">Distinct</option>
+          <option value="Expand">Expand</option>
+          <option value="Correlation">Correlation</option>
+          <option value="Sequence">Sequence (ordered)</option>
+        </select>
+        <button id="add-stage" class="mini">Add</button>
+      </h2>
+      <div id="stages"></div>
+      <p class="hint">Every rule ends in an output stage. That is not decoration:
+        a pipeline with no stated output returns whatever the last stage happened
+        to leave.</p>
+    </div>
+
+    <!-- output --------------------------------------------------------- -->
+    <div class="col scroll">
+      <h2>Rendered
+        <span class="spacer"></span>
+        <button id="render" class="mini">Render</button>
+        <button id="validate" class="mini">Validate</button>
+      </h2>
+      <pre id="rendered" class="code">—</pre>
+      <div id="diagnostics"></div>
+
+      <h2>Test against a sample
+        <span class="spacer"></span>
+        <button id="run" class="mini primary">Run</button>
+      </h2>
+      <p class="hint">One JSON event per line, or a JSON array. Fields must
+        already be parsed — raw log text goes in the From&nbsp;Log tab.</p>
+      <label class="field">Sample format<select id="events-format">
+        <option value="jsonl">one JSON object per line</option>
+        <option value="json">a JSON array</option>
+        <option value="kv">key=value</option>
+        <option value="syslog">syslog</option>
+      </select></label>
+      <textarea id="events" rows="6" class="code" placeholder='{"EventID": 4624, "Computer": "HOST1"}'></textarea>
+      <div id="evaluation"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="pane" id="pane-import">
+  <div class="two-col">
+    <div class="col scroll">
+      <h2>Paste an existing rule</h2>
+      <p class="hint">It is parsed into the builder, so you can read what it
+        actually says and tune it rather than editing text and hoping. Anything
+        that cannot be represented is reported rather than dropped.</p>
+      <label class="field">Dialect of the pasted rule
+        <select id="import-dialect"></select>
+      </label>
+      <textarea id="import-text" rows="22" class="code" placeholder="SecurityEvent&#10;| where EventID == 4624&#10;| where LogonType == 3"></textarea>
+      <button id="import-go" class="primary wide">Analyze and load into builder</button>
+    </div>
+    <div class="col scroll">
+      <h2>What this rule says</h2>
+      <div id="import-outline" class="outline">—</div>
+      <h2>Diagnostics</h2>
+      <div id="import-diagnostics"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="pane" id="pane-fromlog">
+  <div class="two-col">
+    <div class="col scroll">
+      <h2>Paste log samples</h2>
+      <p class="hint">Paste <strong>two or more</strong> events of the same kind.
+        One event cannot tell a stable field from a volatile one, and a rule
+        that pins every field of a single log line matches exactly that line.</p>
+      <label class="field">Format
+        <select id="log-format">
+          <option value="jsonl">JSON, one object per line</option>
+          <option value="json">JSON array</option>
+          <option value="kv">key=value pairs</option>
+          <option value="syslog">Syslog with key=value body</option>
+        </select>
+      </label>
+      <textarea id="log-text" rows="16" class="code" placeholder='{"EventID": 4624, "Computer": "HOST1", "ProcessId": 4821, "TimeCreated": "2026-01-01T10:00:00Z"}&#10;{"EventID": 4624, "Computer": "HOST2", "ProcessId": 9134, "TimeCreated": "2026-01-01T10:00:04Z"}'></textarea>
+
+      <h2>Options</h2>
+      <label class="field">Table / index<input id="log-table" type="text" placeholder="SecurityEvent"></label>
+      <div class="row2">
+        <label class="check"><input type="checkbox" id="opt-skip-volatile" checked> Skip fields that differ between samples</label>
+        <label class="check"><input type="checkbox" id="opt-skip-timestamps" checked> Skip timestamps and ids</label>
+      </div>
+      <div class="row2">
+        <label class="check"><input type="checkbox" id="opt-threshold"> Add a count threshold</label>
+        <label class="field">Group by<input id="opt-groupby" type="text" placeholder="Computer, Account"></label>
+      </div>
+      <button id="log-go" class="primary wide">Analyze samples and propose a rule</button>
+    </div>
+    <div class="col scroll">
+      <h2>Field analysis</h2>
+      <div id="log-fields" class="outline">—</div>
+      <h2>What to check</h2>
+      <!-- The generator's own doubts, next to its output. A proposed rule
+           shown without them reads like an authored one, and a proposed rule
+           that reads like an authored one gets deployed without review. -->
+      <div id="log-messages" class="outline">—</div>
+      <p class="hint">A proposed rule is a hypothesis, not a detection. It is
+        saved to history marked <em>synthesized</em> so nobody mistakes it for
+        one somebody decided on.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="pane" id="pane-history">
+  <div class="two-col">
+    <div class="col scroll">
+      <h2>Versions
+        <span class="spacer"></span>
+        <button id="history-refresh" class="mini">Refresh</button>
+      </h2>
+      <div class="row3">
+        <input id="history-q" type="text" placeholder="search title, id, note">
+        <select id="history-origin">
+          <option value="">any origin</option>
+          <option value="authored">authored</option>
+          <option value="imported">imported</option>
+          <option value="synthesized">synthesized</option>
+        </select>
+        <select id="history-dialect"><option value="">any dialect</option></select>
+      </div>
+      <div id="history-list"></div>
+    </div>
+    <div class="col scroll">
+      <h2>Lineage</h2>
+      <p class="hint">History is append-only. Tuning a rule writes a new
+        version pointing at the one it came from, so "put it back how it was"
+        is always answerable.</p>
+      <div id="history-lineage" class="outline">Select a version.</div>
+    </div>
+  </div>
+</section>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
